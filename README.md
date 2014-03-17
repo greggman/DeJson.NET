@@ -214,9 +214,29 @@ To Do:
     for `CustomCreator`s for those cases when you're serializing from
     C#
 
+*   Support top level Arrays
 
+    Arrays are supported but they have to be members of a class. In other words
 
+        public class Foo {
+           public int[] values;
+        };
 
+        Foo foo = deserializer.Deserialize<Foo>(json);
+
+    works but
+
+        int[] values = deserializer.Deserialize<int[]>(json);
+
+    Does not ... Yet
+
+    Array of Arrays are supported. But, being based on JavaScript multi-dimensional arrays
+    are not.
+
+        public class Foo {
+           public int[][] arrayOfArrayOfValues;  // ok
+           public int[,] multiDimensionalArray;  // BAD!
+        };
 
 
 
