@@ -1,7 +1,7 @@
 DeJson.NET
 ==========
 
-A Deserializer from JSON to C# classes.
+A Deserializer/Serializer from JSON to C# classes.
 
 Example:
 
@@ -46,6 +46,9 @@ Example:
         Console.WriteLine("f.b[0].Length: " + f.b[0].Length);
         Console.WriteLine("f.b[1].Length: " + f.b[1].Length);
         Console.WriteLine("f.b[2].Length: " + f.b[2].Length);
+
+        // Serialize it.
+        Console.WriteLine(Serializer.Serialize(f));
     }
 
 Deserializing Derived Types
@@ -240,6 +243,4 @@ To Do:
            public int[][] arrayOfArrayOfValues;  // ok
            public int[,] multiDimensionalArray;  // BAD!
         };
-
-
 

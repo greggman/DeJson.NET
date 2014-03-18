@@ -32,6 +32,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using MiniJSON;
 
 namespace DeJson {
@@ -219,6 +220,121 @@ public class Deserializer {
 
     private Dictionary<System.Type, CustomCreator> m_creators;
 };
+
+public class Serializer {
+
+    public static string Serialize(object obj) {
+        Serializer s = new Serializer();
+        s.SerializeValue(obj);
+        return s.GetJson();
+    }
+
+    private Serializer() {
+        m_builder = new StringBuilder();
+    }
+
+    private string GetJson() {
+        return m_builder.ToString();
+    }
+
+    private StringBuilder m_builder;
+
+
+    private void SerializeValue(object obj) {
+        System.Type type = obj.GetType();
+
+        if (type.IsArray) {
+            SerializeArray(obj);
+        } else if (type == typeof(string)) {
+            SerializeString(obj as string);
+        } else if (type == typeof(int)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(float)) {
+            m_builder.Append(((float)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        } else if (type == typeof(double)) {
+            m_builder.Append(((double)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        } else if (type == typeof(bool)) {
+            m_builder.Append((bool)obj ? "true" : "false");
+        } else if (type.IsClass) {
+            SerializeObject(obj);
+        } else {
+            throw new System.InvalidOperationException("unsupport type: " + type.Name);
+        }
+    }
+
+    private void SerializeArray(object obj) {
+        m_builder.Append("[");
+        Array array = obj as Array;
+        bool first = true;
+        foreach (object element in array) {
+            if (!first) {
+                m_builder.Append(",");
+            }
+            SerializeValue(element);
+            first = false;
+        }
+        m_builder.Append("]");
+    }
+
+    private void SerializeObject(object obj) {
+        m_builder.Append("{");
+        System.Reflection.FieldInfo[] fields = obj.GetType().GetFields();
+        bool first = true;
+        foreach (System.Reflection.FieldInfo info in fields) {
+            if (!first) {
+                m_builder.Append(",");
+            }
+            SerializeString(info.Name);
+            m_builder.Append(":");
+            object fieldValue = info.GetValue(obj);
+            SerializeValue(fieldValue);
+            first = false;
+        }
+        m_builder.Append("}");
+    }
+
+    private void SerializeString(string str) {
+        m_builder.Append('\"');
+
+        char[] charArray = str.ToCharArray();
+        foreach (var c in charArray) {
+            switch (c) {
+            case '"':
+                m_builder.Append("\\\"");
+                break;
+            case '\\':
+                m_builder.Append("\\\\");
+                break;
+            case '\b':
+                m_builder.Append("\\b");
+                break;
+            case '\f':
+                m_builder.Append("\\f");
+                break;
+            case '\n':
+                m_builder.Append("\\n");
+                break;
+            case '\r':
+                m_builder.Append("\\r");
+                break;
+            case '\t':
+                m_builder.Append("\\t");
+                break;
+            default:
+                int codepoint = Convert.ToInt32(c);
+                if ((codepoint >= 32) && (codepoint <= 126)) {
+                    m_builder.Append(c);
+                } else {
+                    m_builder.Append("\\u");
+                    m_builder.Append(codepoint.ToString("x4"));
+                }
+                break;
+            }
+        }
+
+        m_builder.Append('\"');
+    }
+}
 
 }  // namespace DeJson
 

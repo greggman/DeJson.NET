@@ -282,6 +282,8 @@ public class DeserializeExamples : MonoBehaviour {
         print("f.b[1].Length: " + f.b[1].Length);
         print("f.b[2].Length: " + f.b[2].Length);
 
+        print(Serializer.Serialize(f));
+
         // ----------------------------------------------
         // Derived Classes example #1
 
@@ -300,6 +302,9 @@ public class DeserializeExamples : MonoBehaviour {
         print("raspberry.fruitType: " + raspberry.fruitType);
         print("raspberry.height:    " + ((Raspberry)raspberry).numBulbs);
 
+        print(Serializer.Serialize(apple));
+        print(Serializer.Serialize(raspberry));
+
         // ----------------------------------------------
         // Derived Classes example #2
 
@@ -317,6 +322,9 @@ public class DeserializeExamples : MonoBehaviour {
         print("((MessageDataMouseMove)msg1.data).y     : " + ((MessageDataMouseMove)msg1.data).y    );
         print("msg2.msgType                            : " + msg2.msgType                           );
         print("((MessageDataKeyDown)msg2.data).keyCode : " + ((MessageDataKeyDown)msg2.data).keyCode);
+
+        print(Serializer.Serialize(msg1));
+        print(Serializer.Serialize(msg2));
 
         // ----------------------------------------------
         // More advanced example
@@ -362,5 +370,10 @@ public class DeserializeExamples : MonoBehaviour {
         print("md.data.cmd                           : " + md.data.cmd                          );
         print("((MessageDie)md.data.data).killer     : " + ((MessageDie)md.data.data).killer    );
         print("((MessageDie)md.data.data).crash      : " + ((MessageDie)md.data.data).crash     );
+
+        print(Serializer.Serialize(ma));
+        print(Serializer.Serialize(mb));
+        print(Serializer.Serialize(mc));
+        print(Serializer.Serialize(md));
     }
 }
