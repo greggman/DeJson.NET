@@ -173,10 +173,10 @@ public class Deserializer {
 
     private void DeserializeClassFields(object dest, System.Reflection.FieldInfo[] fields, Dictionary<string, object> src) {
         foreach (System.Reflection.FieldInfo info in fields) {
-
-            object value = src[info.Name];
-            DeserializeField(dest, info, value, src);
-
+            object value;
+            if (src.TryGetValue(info.Name, out value)) {
+                DeserializeField(dest, info, value, src);
+            }
         }
     }
 
@@ -221,5 +221,4 @@ public class Deserializer {
 };
 
 }  // namespace DeJson
-
 

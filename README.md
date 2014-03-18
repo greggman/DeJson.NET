@@ -183,6 +183,9 @@ This was written for consuming JSON provided by JavaScript in a browser
 Classes must have a no parameter constructor and all fields must be public.
 Consider these classes just for passing info through JSON.
 
+Generics are not supported AFAIK. I'm sure there's a host of other cases
+not supported.
+
 Why?
 ----
 
