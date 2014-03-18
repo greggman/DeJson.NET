@@ -285,6 +285,19 @@ public class DeserializeExamples : MonoBehaviour {
         print(Serializer.Serialize(f));
 
         // ----------------------------------------------
+        // Array
+
+        string kj = "[4,7,9]";
+
+        int[] k = deserializer.Deserialize<int[]>(kj);
+
+        print("k[0]: " + k[0]);
+        print("k[1]: " + k[1]);
+        print("k[2]: " + k[2]);
+
+        print(Serializer.Serialize(k));
+
+        // ----------------------------------------------
         // Derived Classes example #1
 
         deserializer.RegisterCreator(new FruitCreator());

@@ -49,6 +49,19 @@ Example:
 
         // Serialize it.
         Console.WriteLine(Serializer.Serialize(f));
+
+        // ----------------------------------------------
+        // Array
+
+        string kj = "[4,7,9]";
+
+        int[] k = deserializer.Deserialize<int[]>(kj);
+
+        Console.WriteLine("k[0]: " + k[0]);
+        Console.WriteLine("k[1]: " + k[1]);
+        Console.WriteLine("k[2]: " + k[2]);
+
+        Console.WriteLine(Serializer.Serialize(k));
     }
 
 Deserializing Derived Types
@@ -189,6 +202,14 @@ Consider these classes just for passing info through JSON.
 Generics are not supported AFAIK. I'm sure there's a host of other cases
 not supported.
 
+Array of Arrays are supported. But, being based on JavaScript multi-dimensional arrays
+are not.
+
+    public class Foo {
+       public int[][] arrayOfArrayOfValues;  // ok
+       public int[,] multiDimensionalArray;  // BAD!
+    };
+
 Why?
 ----
 
@@ -220,27 +241,5 @@ To Do:
     for `CustomCreator`s for those cases when you're serializing from
     C#
 
-*   Support top level Arrays
 
-    Arrays are supported but they have to be members of a class. In other words
-
-        public class Foo {
-           public int[] values;
-        };
-
-        Foo foo = deserializer.Deserialize<Foo>(json);
-
-    works but
-
-        int[] values = deserializer.Deserialize<int[]>(json);
-
-    Does not ... Yet
-
-    Array of Arrays are supported. But, being based on JavaScript multi-dimensional arrays
-    are not.
-
-        public class Foo {
-           public int[][] arrayOfArrayOfValues;  // ok
-           public int[,] multiDimensionalArray;  // BAD!
-        };
 

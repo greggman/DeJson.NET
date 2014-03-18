@@ -130,9 +130,14 @@ public class Deserializer {
     ///
     /// </code>
     /// </example>
-    public T Deserialize<T> (string json) where T : new() {
-        Dictionary<string, object> src = (Dictionary<string, object>)Json.Deserialize(json);
-        return DeserializeT<T>(src);
+    public T Deserialize<T> (string json) /*where T : new()*/ {
+        object o = Json.Deserialize(json);
+        System.Type type = o.GetType();
+        if (type == typeof(List<object>)) {
+            return (T)ConvertToArray(o, typeof(T), null);
+        } else {
+            return DeserializeT<T>((Dictionary<string, object>)o);
+        }
     }
 
     /// <summary>
@@ -144,10 +149,11 @@ public class Deserializer {
         m_creators[t] = creator;
     }
 
-    private T DeserializeT<T>(Dictionary<string, object> src) where T : new() {
+    private T DeserializeT<T>(Dictionary<string, object> src) /*where T : new()*/ {
         object o = DeserializeO(typeof(T), src, null);
         return (T)o;
     }
+
 
     private object DeserializeO(Type destType, Dictionary<string, object> src, Dictionary<string, object> parentSrc) {
         object dest = null;
@@ -189,17 +195,7 @@ public class Deserializer {
 
     private object ConvertToType(object value, System.Type type, Dictionary<string, object> src) {
         if (type.IsArray) {
-            List<object> elements = (List<object>)value;
-            int numElements = elements.Count;
-            Type elementType = type.GetElementType();
-            Array array = Array.CreateInstance(elementType, numElements);
-            int index = 0;
-            foreach (object elementValue in elements) {
-                object o = ConvertToType(elementValue, elementType, src);
-                array.SetValue(o, index);
-                ++index;
-            }
-            return array;
+            return ConvertToArray(value, type, src);
         } else if (type == typeof(string)) {
             return Convert.ToString(value);
         } else if (type == typeof(int)) {
@@ -216,6 +212,20 @@ public class Deserializer {
             // Should we throw here?
         }
         return value;
+    }
+
+    private object ConvertToArray(object value, System.Type type, Dictionary<string, object> src) {
+        List<object> elements = (List<object>)value;
+        int numElements = elements.Count;
+        Type elementType = type.GetElementType();
+        Array array = Array.CreateInstance(elementType, numElements);
+        int index = 0;
+        foreach (object elementValue in elements) {
+            object o = ConvertToType(elementValue, elementType, src);
+            array.SetValue(o, index);
+            ++index;
+        }
+        return array;
     }
 
     private Dictionary<System.Type, CustomCreator> m_creators;
