@@ -103,6 +103,7 @@ public class Deserializer {
     /// Deserializes a json string into classes.
     /// </summary>
     /// <param name="json">String containing JSON</param>
+    /// <param name="includeTypeInfoForDerviedTypes">Default false</param>
     /// <returns>An instance of class T.</returns>
     /// <example>
     /// <code>
@@ -147,12 +148,18 @@ public class Deserializer {
     private object DeserializeO(Type destType, Dictionary<string, object> src, Dictionary<string, object> parentSrc) {
         object dest = null;
 
+        // First see if there is a CustomCreator for this type.
         CustomCreator creator;
         if (m_creators.TryGetValue(destType, out creator)) {
             dest = creator.Create(src, parentSrc);
         }
 
         if (dest == null) {
+            // Check if there is a type serialized for this
+            object typeNameObject;
+            if (src.TryGetValue("$dotNetType", out typeNameObject)) {
+                destType =System.Type.GetType((string)typeNameObject);
+            }
             dest = Activator.CreateInstance(destType);
         }
 
@@ -222,14 +229,15 @@ public class Deserializer {
 
 public class Serializer {
 
-    public static string Serialize(object obj) {
-        Serializer s = new Serializer();
+    public static string Serialize(object obj, bool includeTypeInfoForDerivedTypes = false) {
+        Serializer s = new Serializer(includeTypeInfoForDerivedTypes);
         s.SerializeValue(obj);
         return s.GetJson();
     }
 
-    private Serializer() {
+    private Serializer(bool includeTypeInfoForDerivedTypes) {
         m_builder = new StringBuilder();
+        m_includeTypeInfoForDerivedTypes = includeTypeInfoForDerivedTypes;
     }
 
     private string GetJson() {
@@ -237,7 +245,7 @@ public class Serializer {
     }
 
     private StringBuilder m_builder;
-
+    private bool m_includeTypeInfoForDerivedTypes;
 
     private void SerializeValue(object obj) {
         System.Type type = obj.GetType();
@@ -277,8 +285,18 @@ public class Serializer {
 
     private void SerializeObject(object obj) {
         m_builder.Append("{");
-        System.Reflection.FieldInfo[] fields = obj.GetType().GetFields();
         bool first = true;
+        if (m_includeTypeInfoForDerivedTypes) {
+            // Only inlcude type info for derived types.
+            System.Type type = obj.GetType();
+            System.Type baseType = type.BaseType;
+            if (baseType != null && baseType != typeof(System.Object)) {
+                SerializeString("$dotNetType");  // assuming this won't clash with user's properties.
+                m_builder.Append(":");
+                SerializeString(type.FullName);
+            }
+        }
+        System.Reflection.FieldInfo[] fields = obj.GetType().GetFields();
         foreach (System.Reflection.FieldInfo info in fields) {
             if (!first) {
                 m_builder.Append(",");

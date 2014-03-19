@@ -189,6 +189,51 @@ inspect the parent's field in your creator. Example
         Console.WriteLine("((MessageDataKeyDown)msg2.data).keyCode : " + ((MessageDataKeyDown)msg2.data).keyCode);
     }
 
+If your just serializing in and out of .NET (in other words you're not going to real JavaScript)
+then you can choose to have dervied types save their type info when serializing and use that
+info when deserializing. Example
+
+    public class Animal {
+    }
+
+    public class Dog : Animal {
+        public Dog() { }  // must have no param ctor for deseralization
+        public Dog(int _barkiness) {
+            barkiness = _barkiness;
+        }
+        public int barkiness;
+    }
+
+    public class Cat : Animal {
+        public Cat() { }  // must have no param ctor for deseralization
+        public Cat(int _stealthiness) {
+            stealthiness = _stealthiness;
+        }
+        public int stealthiness;
+    }
+
+...
+
+    void Test() {
+        Deserializer deserializer = new Deserializer();
+
+        Dog da = new Dog(123);
+        Cat ca = new Cat(456);
+        Animal[] animals = new Animal[2];
+        animals[0] = da;
+        animals[1] = ca;
+
+        // Passing in true to Serialize tells it to serialize type data for
+        // derived types.
+        string animalsJson = Serializer.Serialize(animals, true);
+        Animal[] ani = deserializer.Deserialize<Animal[]>(animalsJson);
+
+        Console.WriteLine("--[ auto type serialization example ]------------------------");
+        Console.WriteLine("serialized as: " + animalsJson);
+        Console.WriteLine("((Dog)ani[0]).barkiness   : " + ((Dog)ani[0]).barkiness   );
+        Console.WriteLine("((Cat)ani[1]).stealthiness: " + ((Cat)ani[1]).stealthiness);
+    }
+
 Notes:
 ------
 
@@ -234,12 +279,20 @@ It's the MIT license. See top of DeJson.cs
 To Do:
 ------
 
-*   Consider updating to handle auto serializing type info.
+*   Support more types?
 
-    If I modified MiniJSON to optionally output type info then I could also
-    modify the Deserializer to use that info. This would remove the need
-    for `CustomCreator`s for those cases when you're serializing from
-    C#
+    JSON only has a few types. `number`, `string`, `boolean`, `array`, `object`.
+    C# has more like `float`, `int`, `int64`, `double`, `char` etc. I'm not sure
+    how many are important to store.
 
+    For example there's no int64 in JSON so serializing from/to one seems questionable
+    since if in C# you needed an int64 when you transfer it to JavaScript it's going to fail.
+    If you really want an int64 in and out of JavaScript then you'd need to convert it to
+    string in C# and that string into some kind of object in JavaScript that can actually
+    handle 64bit ints.
+
+    char is also problemantic I'm guessing as char is 16bit but there is no char type in
+    JavaScript there's only strings, including 1 character strings and there's number.
+    If you want a char it seems better to use an int.
 
 

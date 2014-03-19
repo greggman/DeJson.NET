@@ -143,6 +143,28 @@ public class DeserializeExamples : MonoBehaviour {
     }
 
     // ----------------------------------------------
+    // Classes to test auto type serialization
+
+    public class Animal {
+    }
+
+    public class Dog : Animal {
+        public Dog() { }  // must have no param ctor for deseralization
+        public Dog(int _barkiness) {
+            barkiness = _barkiness;
+        }
+        public int barkiness;
+    }
+
+    public class Cat : Animal {
+        public Cat() { }  // must have no param ctor for deseralization
+        public Cat(int _stealthiness) {
+            stealthiness = _stealthiness;
+        }
+        public int stealthiness;
+    }
+
+    // ----------------------------------------------
     // Classes for more advanced example.
     //
     // This is basically the same as Derived sample #2 except with
@@ -339,6 +361,23 @@ public class DeserializeExamples : MonoBehaviour {
 
         print(Serializer.Serialize(msg1));
         print(Serializer.Serialize(msg2));
+
+        // ----------------------------------------------
+        // Auto type serialization example
+
+        Dog da = new Dog(123);
+        Cat ca = new Cat(456);
+        Animal[] animals = new Animal[2];
+        animals[0] = da;
+        animals[1] = ca;
+
+        string animalsJson = Serializer.Serialize(animals, true);
+        Animal[] ani = deserializer.Deserialize<Animal[]>(animalsJson);
+
+        print("--[ auto type serialization example ]------------------------");
+        print("serialized as: " + animalsJson);
+        print("((Dog)ani[0]).barkiness   : " + ((Dog)ani[0]).barkiness   );
+        print("((Cat)ani[1]).stealthiness: " + ((Cat)ani[1]).stealthiness);
 
         // ----------------------------------------------
         // More advanced example
