@@ -132,12 +132,7 @@ public class Deserializer {
     /// </example>
     public T Deserialize<T> (string json) /*where T : new()*/ {
         object o = Json.Deserialize(json);
-        System.Type type = o.GetType();
-        if (type == typeof(List<object>)) {
-            return (T)ConvertToArray(o, typeof(T), null);
-        } else {
-            return DeserializeT<T>((Dictionary<string, object>)o);
-        }
+        return (T)ConvertToType(o, typeof(T), null);
     }
 
     /// <summary>
@@ -148,12 +143,6 @@ public class Deserializer {
         System.Type t = creator.TypeToCreate();
         m_creators[t] = creator;
     }
-
-    private T DeserializeT<T>(Dictionary<string, object> src) /*where T : new()*/ {
-        object o = DeserializeO(typeof(T), src, null);
-        return (T)o;
-    }
-
 
     private object DeserializeO(Type destType, Dictionary<string, object> src, Dictionary<string, object> parentSrc) {
         object dest = null;

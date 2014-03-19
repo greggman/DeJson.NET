@@ -291,6 +291,7 @@ public class DeserializeExamples : MonoBehaviour {
 
         int[] k = deserializer.Deserialize<int[]>(kj);
 
+        print("--[ Array ]------------------------");
         print("k[0]: " + k[0]);
         print("k[1]: " + k[1]);
         print("k[2]: " + k[2]);
