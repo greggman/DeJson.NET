@@ -11,4 +11,5 @@ temp
 .hg
 *.pyc
 *.orig
+*.meta
 .project
