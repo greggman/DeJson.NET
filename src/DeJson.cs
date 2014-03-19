@@ -130,7 +130,7 @@ public class Deserializer {
     ///
     /// </code>
     /// </example>
-    public T Deserialize<T> (string json) /*where T : new()*/ {
+    public T Deserialize<T> (string json) {
         object o = Json.Deserialize(json);
         return (T)ConvertToType(o, typeof(T), null);
     }
