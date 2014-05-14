@@ -47,14 +47,14 @@ public class DeserializeExamples : MonoBehaviour {
     // ----------------------------------------------
     // Classes for basic example
     class Bar {
-        public int z;
-        public int a;
+        public int z = 0;
+        public int a = 0;
     }
     class Foo {
-        public int x;
-        public int y;
-        public Bar[] g;
-        public int[][] b;
+        public int x = 0;
+        public int y = 0;
+        public Bar[] g = null;
+        public int[][] b = null;
     }
 
     // ----------------------------------------------
