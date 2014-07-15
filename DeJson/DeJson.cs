@@ -260,6 +260,10 @@ public class Serializer {
     private bool m_includeTypeInfoForDerivedTypes;
 
     private void SerializeValue(object obj) {
+        if (obj == null) {
+            m_builder.Append("undefined");
+            return;
+        }
         System.Type type = obj.GetType();
 
         if (type.IsArray) {
@@ -310,14 +314,16 @@ public class Serializer {
         }
         System.Reflection.FieldInfo[] fields = obj.GetType().GetFields();
         foreach (System.Reflection.FieldInfo info in fields) {
-            if (!first) {
-                m_builder.Append(",");
-            }
-            SerializeString(info.Name);
-            m_builder.Append(":");
             object fieldValue = info.GetValue(obj);
-            SerializeValue(fieldValue);
-            first = false;
+            if (fieldValue != null) {
+				if (!first) {
+					m_builder.Append(",");
+				}
+				SerializeString(info.Name);
+                m_builder.Append(":");
+                SerializeValue(fieldValue);
+                first = false;
+            }
         }
         m_builder.Append("}");
     }

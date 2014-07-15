@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeJsonUnity", "DeJson\DeJsonUnity.csproj", "{54485825-A596-4007-97C0-8B6EE552F366}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeJsonTest", "DeJsonTest\DeJsonTest.csproj", "{027736BD-DF49-428D-81A0-EDAFD67FA385}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeJson", "DeJson\DeJson.csproj", "{E6C9CDEE-7441-4E27-A93C-8985EE1D878D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{027736BD-DF49-428D-81A0-EDAFD67FA385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{027736BD-DF49-428D-81A0-EDAFD67FA385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{027736BD-DF49-428D-81A0-EDAFD67FA385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{027736BD-DF49-428D-81A0-EDAFD67FA385}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54485825-A596-4007-97C0-8B6EE552F366}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54485825-A596-4007-97C0-8B6EE552F366}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54485825-A596-4007-97C0-8B6EE552F366}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54485825-A596-4007-97C0-8B6EE552F366}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6C9CDEE-7441-4E27-A93C-8985EE1D878D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6C9CDEE-7441-4E27-A93C-8985EE1D878D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6C9CDEE-7441-4E27-A93C-8985EE1D878D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6C9CDEE-7441-4E27-A93C-8985EE1D878D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = DeJson\DeJsonUnity.csproj
+	EndGlobalSection
+EndGlobal

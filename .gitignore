@@ -1,4 +1,7 @@
 node_modules
+bin
+test-results
+*.userprefs
 .DS_Store
 *~
 *.swp
