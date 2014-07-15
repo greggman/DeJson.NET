@@ -260,7 +260,7 @@ Why?
 
 I tried to use JSON.NET but I needed it for Unity3D. Unity3D is apparently
 using .NET 2.0. JSON.NET supports .NET 2.0 but I couldn't get it to
-do. In particular I couldn't get it to handle the 2 advanced cases
+work. In particular I couldn't get it to handle the 2 advanced cases
 above. In JSON.NET you can apparently handle the first case where
 the field that determines the type is in the class being deserialized
 but unfortunately to do that it uses some advanced features of Linq
