@@ -10,7 +10,7 @@
     <RootNamespace>DeJson</RootNamespace>
     <AssemblyName>DeJson</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ReleaseVersion>1.1</ReleaseVersion>
+    <ReleaseVersion>1.1.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -37,5 +37,6 @@
   <ItemGroup>
     <Compile Include="DeJson.cs" />
     <Compile Include="MiniJSON.cs" />
+    <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
 </Project>

@@ -186,7 +186,7 @@ public class Deserializer {
 
         // This seems like a hack but for now maybe it's the right thing?
         // Basically if the thing you want is a Dictionary<stirng, object>
-        // Then just give it do you since that's the source. No need
+        // Then just give it to you since that's the source. No need
         // to try to copy it.
         if (destType == typeof(Dictionary<string, object>)) {
             return src;
@@ -233,13 +233,15 @@ public class Deserializer {
     private void DeserializeField(object dest, System.Reflection.FieldInfo info, object value, Dictionary<string, object> src) {
         Type fieldType = info.FieldType;
         object o = ConvertToType(value, fieldType, src);
-        info.SetValue(dest, o);
+        if (fieldType.IsAssignableFrom(o.GetType())) {
+            info.SetValue(dest, o);
+        }
     }
 
     private object ConvertToType(object value, System.Type type, Dictionary<string, object> src) {
         if (type.IsArray) {
             return ConvertToArray(value, type, src);
-//       } else if (type.IsPrimitive) {
+//        } else if (type.IsPrimitive) {
 //           return System.ComponentModel.TypeDescriptor.GetConverter(type).ConvertFromInvariantString(value.ToString ());
         } else if (type == typeof(string)) {
             return Convert.ToString(value);
@@ -272,6 +274,8 @@ public class Deserializer {
         } else if (type == typeof(double)) {
             return Convert.ToDouble(value);
         } else if (type == typeof(bool)) {
+            return Convert.ToBoolean(value);
+        } else if (type == typeof(Boolean)) {
             return Convert.ToBoolean(value);
         } else if (type.IsValueType) {
             return DeserializeO(type, (Dictionary<string, object>)value, src);
@@ -382,18 +386,38 @@ public class Serializer {
             SerializeString(obj.ToString());
         } else if (type == typeof(bool)) {
             m_builder.Append((bool)obj ? "true" : "false");
-        } else if (type.IsPrimitive) {
-            m_builder.Append(System.ComponentModel.TypeDescriptor.GetConverter(type).ConvertToInvariantString(obj));
+        } else if (type == typeof(Boolean)) {
+            m_builder.Append((Boolean)obj ? "true" : "false");
+//        } else if (type.IsPrimitive) {
+//            m_builder.Append(System.ComponentModel.TypeDescriptor.GetConverter(type).ConvertToInvariantString(obj));
 
-//            m_builder.Append(Convert.ChangeType(obj, typeof(string)));
-//        } else if (type == typeof(int)) {
-//            m_builder.Append(obj);
-//        } else if (type == typeof(Int64)) {
-//            m_builder.Append(obj);
-//        } else if (type == typeof(float)) {
-//            m_builder.Append(((float)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
-//        } else if (type == typeof(double)) {
-//            m_builder.Append(((double)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+            m_builder.Append(Convert.ChangeType(obj, typeof(string)));
+        } else if (type == typeof(int)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(Byte)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(SByte)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(Int16)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(UInt16)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(Int32)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(UInt32)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(Int64)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(UInt64)) {
+            m_builder.Append(obj);
+        } else if (type == typeof(Single)) {
+            m_builder.Append(((Single)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        } else if (type == typeof(Double)) {
+            m_builder.Append(((Double)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        } else if (type == typeof(float)) {
+            m_builder.Append(((float)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        } else if (type == typeof(double)) {
+            m_builder.Append(((double)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
         } else if (type.IsValueType) {
             SerializeObject(obj);
         } else if (type.IsClass) {
