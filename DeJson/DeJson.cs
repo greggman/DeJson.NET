@@ -103,7 +103,6 @@ public class Deserializer {
     /// Deserializes a json string into classes.
     /// </summary>
     /// <param name="json">String containing JSON</param>
-    /// <param name="includeTypeInfoForDerviedTypes">Default false</param>
     /// <returns>An instance of class T.</returns>
     /// <example>
     /// <code>
@@ -136,6 +135,39 @@ public class Deserializer {
         return Deserialize<T>(o);
     }
 
+    /// <summary>
+    /// Deserializes a object into classes.
+    /// </summary>
+    /// <param name="o">Object containing data</param>
+    /// <returns>An instance of class T.</returns>
+    /// <example>
+    /// <code>
+    ///     public class Foo {
+    ///         public int num;
+    ///         public string name;
+    ///         public float weight;
+    ///     };
+    ///
+    ///     public class Bar {
+    ///         public int hp;
+    ///         public Foo someFoo;
+    ///     };
+    /// ...
+    ///     Deserializer deserializer = new Deserializer();
+    ///
+    ///     Dictionary<string, object> d = new Dictionary<string, object>
+    ///     d["num"] = 123;
+    ///     d["name"] = "Bob";
+    ///     d["weight] = 4.5f;
+    ///
+    ///     Foo foo = deserializer.Deserialize<Foo>(d);
+    ///
+    ///     print("foo.num: " + foo.num);
+    ///     print("foo.name: " + foo.name);
+    ///     print("foo.weight: " + foo.weight);
+    ///
+    /// </code>
+    /// </example>
     public T Deserialize<T>(object o) {
         return (T)ConvertToType(o, typeof(T), null);
     }
@@ -268,8 +300,21 @@ public class Deserializer {
     private Dictionary<System.Type, CustomCreator> m_creators;
 };
 
+/// <summary>
+/// At this point this is just a namespace.
+/// See Serializer.Serialize
+/// </summary>
 public class Serializer {
 
+    /// <summary>
+    /// Serializes an object to JSON.
+    ///
+    /// Only Public fields will be serialized.
+    /// </summary>
+    /// <param name="obj">Object to serialized</param>
+    /// <param name="includeTypeInfoForDerivedTypes">true if you want it to add type data for derived types</param>
+    /// <param name="prettyPrint">try if you want whitespace, linebreaks, and indention</param>
+    /// <returns>a json string representing the object passed in.</returns>
     public static string Serialize(object obj, bool includeTypeInfoForDerivedTypes = false, bool prettyPrint = false) {
         Serializer s = new Serializer(includeTypeInfoForDerivedTypes, prettyPrint);
         s.SerializeValue(obj);
