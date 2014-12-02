@@ -3,7 +3,11 @@ DeJson.NET
 
 A Deserializer/Serializer from JSON to C# classes.
 
+To use [grab the DLL here](https://github.com/greggman/DeJson.NET/releases/download/v1.1.0/DeJson.dll)
+and drop it in your Unity3D project (or other .net project)
+
 Example:
+--------
 
     using DeJson;
 
