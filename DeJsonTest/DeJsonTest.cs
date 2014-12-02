@@ -38,11 +38,11 @@ namespace DeJsonTest
             public Bar c;
         };
 
-		// Classes for SomeUndefinedExample
-		public class Something {
-			public string a;
-			public string b;
-		}
+        // Classes for SomeUndefinedExample
+        public class Something {
+            public string a;
+            public string b;
+        }
 
         // ----------------------------------------------
         // Classes for Dervied example #1
@@ -334,25 +334,25 @@ namespace DeJsonTest
             Assert.AreEqual(s, "{}");
         }
 
-		[Test()]
-		public void SomeUndefinedTest() 
-		{
-			Deserializer deserializer = new Deserializer();
-			string u1 = "{\"a\":\"b\"}";
+        [Test()]
+        public void SomeUndefinedTest()
+        {
+            Deserializer deserializer = new Deserializer();
+            string u1 = "{\"a\":\"b\"}";
 
-			Something s = deserializer.Deserialize<Something>(u1);
-			Assert.AreEqual(s.a, "b");
-			Assert.AreEqual(s.b, null);
+            Something s = deserializer.Deserialize<Something>(u1);
+            Assert.AreEqual(s.a, "b");
+            Assert.AreEqual(s.b, null);
 
-			string ss = Serializer.Serialize (s);
+            string ss = Serializer.Serialize (s);
 
-			Assert.AreEqual(ss, u1);
+            Assert.AreEqual(ss, u1);
 
-			Something s2 = deserializer.Deserialize<Something>(ss);
+            Something s2 = deserializer.Deserialize<Something>(ss);
 
-			Assert.AreEqual(s2.a, "b");
-			Assert.AreEqual(s2.b, null);
-		}
+            Assert.AreEqual(s2.a, "b");
+            Assert.AreEqual(s2.b, null);
+        }
 
         public void CheckApple(Apple a)
         {
@@ -521,6 +521,193 @@ namespace DeJsonTest
             CheckMessageSetName(mb2);
             CheckMessageLaunch(mc2);
             CheckMessageDie(md2);
+        }
+
+        bool DictionariesAreSame(Dictionary<string, object> a, Dictionary<string, object> b)
+        {
+            foreach (string key in a.Keys) {
+                object valueb;
+                if (!b.TryGetValue(key, out valueb)) {
+                    Console.Error.WriteLine(String.Format("b missing key: {0}", key));
+                    return false;
+                }
+                object valuea = a[key];
+                System.Type aType = valuea.GetType();
+                if (aType != valueb.GetType()) {
+                    Console.Error.WriteLine(String.Format("not same type for key: {0}", key));
+                    return false;
+                }
+
+                if (aType.IsValueType) {
+                    if (!valuea.Equals(valueb)) {
+                        Console.Error.WriteLine(String.Format("{0} != {1} for key: {2}", valuea.ToString(), valueb.ToString(), key));
+                        return false;
+                    }
+                } else if (aType == typeof(string)) {
+                    if (valuea.ToString () != valueb.ToString ())
+                    {
+                        Console.Error.WriteLine(String.Format("{0} != {1} for key: {2}", valuea.ToString(), valueb.ToString(), key));
+                        return false;
+                    }
+                } else {
+                    // Need to handle none dictionaries
+                    bool same = DictionariesAreSame((Dictionary<string,object>)valuea, (Dictionary<string,object>)valueb);
+                    if (!same) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        [Test()]
+        public void RoundTrip01Test()
+        {
+            Deserializer deserializer = new Deserializer();
+
+            string j = "{\"cmd\":\"update\",\"id\":123,\"data\":{\"cmd\":\"setColor\",\"data\":{\"color\":\"red\",\"style\":\"bold\"}}}";
+
+            Dictionary<string, object>data1 = deserializer.Deserialize<Dictionary<string, object> >(j);
+
+            string newJ = Serializer.Serialize(data1);
+
+            Dictionary<string, object>data2 = deserializer.Deserialize<Dictionary<string, object> >(newJ);
+
+            Assert.IsTrue(DictionariesAreSame(data1, data2));
+
+            string anotherJ = Serializer.Serialize(data2);
+            Assert.AreEqual(newJ, anotherJ);    //  this assumes given the same data we'll get the same string with fields in the same order
+        }
+
+        struct Vector2 {
+            public float x;
+            public float y;
+        };
+
+        [Test()]
+        public void StructTest01()
+        {
+            Deserializer deserializer = new Deserializer();
+
+            string j = "{\"x\":1.2,\"y\":3.4}";
+
+            Vector2 v = deserializer.Deserialize<Vector2>(j);
+            Assert.AreEqual(v.x, 1.2f);
+            Assert.AreEqual(v.y, 3.4f);
+
+            string newJ = Serializer.Serialize(v);
+
+            Vector2 v2 = deserializer.Deserialize<Vector2>(newJ);
+
+            Assert.AreEqual(v2.x, v.x);
+            Assert.AreEqual(v2.y, v.y);
+        }
+
+        [Test()]
+        public void StructTest02()
+        {
+            Deserializer deserializer = new Deserializer();
+
+            string j = "[{\"x\":1.2,\"y\":3.4},{\"x\":5.6,\"y\":7.8}]";
+
+            Vector2[] v = deserializer.Deserialize<Vector2[]>(j);
+            Assert.AreEqual(v.Length, 2);
+            Assert.AreEqual(v[0].x, 1.2f);
+            Assert.AreEqual(v[0].y, 3.4f);
+            Assert.AreEqual(v[1].x, 5.6f);
+            Assert.AreEqual(v[1].y, 7.8f);
+
+            string newJ = Serializer.Serialize(v);
+
+            Vector2[] v2 = deserializer.Deserialize<Vector2[]>(newJ);
+
+            Assert.AreEqual(v2.Length, 2);
+            Assert.AreEqual(v2[0].x, v[0].x);
+            Assert.AreEqual(v2[0].y, v[0].y);
+            Assert.AreEqual(v2[1].x, v[1].x);
+            Assert.AreEqual(v2[1].y, v[1].y);
+        }
+
+        struct HasStatic {
+            public int someProp;
+            public static int someStaticProp;
+        }
+
+        [Test()]
+        public void StructWithStaticTest()
+        {
+            HasStatic s = new HasStatic();
+            s.someProp = 123;
+            HasStatic.someStaticProp = 456;
+
+            string json = Serializer.Serialize(s);
+            Assert.That(json, Is.Not.StringContaining("someStaticProp"));
+
+            string j = "{\"someProp\":123,\"someStaticProp\":789}";
+            Deserializer deserializer = new Deserializer();
+            HasStatic s2 = deserializer.Deserialize<HasStatic>(j);
+            Assert.AreEqual(s2.someProp, 123);
+            Assert.AreEqual(HasStatic.someStaticProp, 456);
+        }
+
+        class Primitives {
+            public Boolean someBoolean = true;
+            public Byte someByte = 1;
+            public SByte someSByte = -1;
+            public Int16 someInt16 = -2;
+            public UInt16 someUInt16 = 2;
+            public Int32 someInt32 = -3;
+            public UInt32 someUInt32 = 3;
+            public Int64 someInt64 = -4;
+            public UInt64 someUInt64 = 4;
+            public Char someChar = 'a';
+            public Double someDouble = 1.23;
+            public Single someSingle = 2.34f;
+            public float somefloat = 3.45f;
+            public int someint = 5;
+            public bool somebool = true;
+        };
+
+        [Test()]
+        public void PrimitivesTest()
+        {
+            Primitives p = new Primitives();
+            p.someBoolean = false;
+            p.someByte = 6;
+            p.someSByte = -6;
+            p.someInt16 = -7;
+            p.someUInt16 = 7;
+            p.someInt32 = -8;
+            p.someUInt32 = 8;
+            p.someInt64 = -9;
+            p.someUInt64 = 9;
+            p.someChar = 'b';
+            p.someDouble = 5.6;
+            p.someSingle = 6.7f;
+            p.somefloat = 7.8f;
+            p.someint = 12;
+            p.somebool = false;
+
+            string json = Serializer.Serialize(p);
+            Deserializer deserializer = new Deserializer();
+            Primitives p2 = deserializer.Deserialize<Primitives>(json);
+
+            Assert.AreEqual(p.someBoolean, p2.someBoolean);
+            Assert.AreEqual(p.someByte, p2.someByte);
+            Assert.AreEqual(p.someSByte, p2.someSByte);
+            Assert.AreEqual(p.someInt16, p2.someInt16);
+            Assert.AreEqual(p.someUInt16, p2.someUInt16);
+            Assert.AreEqual(p.someInt32, p2.someInt32);
+            Assert.AreEqual(p.someUInt32, p2.someUInt32);
+            Assert.AreEqual(p.someInt64, p2.someInt64);
+            Assert.AreEqual(p.someUInt64, p2.someUInt64);
+            Assert.AreEqual(p.someChar, p2.someChar);
+            Assert.AreEqual(p.someDouble, p2.someDouble);
+            Assert.AreEqual(p.someSingle, p2.someSingle);
+            Assert.AreEqual(p.somefloat, p2.somefloat);
+            Assert.AreEqual(p.someint, p2.someint);
+            Assert.AreEqual(p.somebool, p2.somebool);
         }
     }
 }

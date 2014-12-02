@@ -188,6 +188,9 @@ public class Deserializer {
 
     private void DeserializeClassFields(object dest, System.Reflection.FieldInfo[] fields, Dictionary<string, object> src) {
         foreach (System.Reflection.FieldInfo info in fields) {
+            if (info.IsStatic) {
+                continue;
+            }
             object value;
             if (src.TryGetValue(info.Name, out value)) {
                 DeserializeField(dest, info, value, src);
@@ -204,8 +207,32 @@ public class Deserializer {
     private object ConvertToType(object value, System.Type type, Dictionary<string, object> src) {
         if (type.IsArray) {
             return ConvertToArray(value, type, src);
+//       } else if (type.IsPrimitive) {
+//           return System.ComponentModel.TypeDescriptor.GetConverter(type).ConvertFromInvariantString(value.ToString ());
         } else if (type == typeof(string)) {
             return Convert.ToString(value);
+        } else if (type == typeof(Byte)) {
+            return Convert.ToByte(value);
+        } else if (type == typeof(SByte)) {
+            return Convert.ToSByte(value);
+        } else if (type == typeof(Int16)) {
+            return Convert.ToInt16(value);
+        } else if (type == typeof(UInt16)) {
+            return Convert.ToUInt16(value);
+        } else if (type == typeof(Int32)) {
+            return Convert.ToInt32(value);
+        } else if (type == typeof(UInt32)) {
+            return Convert.ToUInt32(value);
+        } else if (type == typeof(Int64)) {
+            return Convert.ToInt64(value);
+        } else if (type == typeof(UInt64)) {
+            return Convert.ToUInt64(value);
+        } else if (type == typeof(Char)) {
+            return Convert.ToChar(value);
+        } else if (type == typeof(Double)) {
+            return Convert.ToDouble(value);
+        } else if (type == typeof(Single)) {
+            return Convert.ToSingle(value);
         } else if (type == typeof(int)) {
             return Convert.ToInt32(value);
         } else if (type == typeof(float)) {
@@ -214,6 +241,8 @@ public class Deserializer {
             return Convert.ToDouble(value);
         } else if (type == typeof(bool)) {
             return Convert.ToBoolean(value);
+        } else if (type.IsValueType) {
+            return DeserializeO(type, (Dictionary<string, object>)value, src);
         } else if (type.IsClass) {
             return DeserializeO(type, (Dictionary<string, object>)value, src);
         } else {
@@ -241,15 +270,17 @@ public class Deserializer {
 
 public class Serializer {
 
-    public static string Serialize(object obj, bool includeTypeInfoForDerivedTypes = false) {
-        Serializer s = new Serializer(includeTypeInfoForDerivedTypes);
+    public static string Serialize(object obj, bool includeTypeInfoForDerivedTypes = false, bool prettyPrint = false) {
+        Serializer s = new Serializer(includeTypeInfoForDerivedTypes, prettyPrint);
         s.SerializeValue(obj);
         return s.GetJson();
     }
 
-    private Serializer(bool includeTypeInfoForDerivedTypes) {
+    private Serializer(bool includeTypeInfoForDerivedTypes, bool prettyPrint) {
         m_builder = new StringBuilder();
         m_includeTypeInfoForDerivedTypes = includeTypeInfoForDerivedTypes;
+        m_prettyPrint = prettyPrint;
+        m_prefix = "";
     }
 
     private string GetJson() {
@@ -258,6 +289,38 @@ public class Serializer {
 
     private StringBuilder m_builder;
     private bool m_includeTypeInfoForDerivedTypes;
+    private bool m_prettyPrint;
+    private string m_prefix;
+
+    private void Indent() {
+        if (m_prettyPrint) {
+            m_prefix = m_prefix + "  ";
+        }
+    }
+
+    private void Outdent() {
+        if (m_prettyPrint) {
+            m_prefix = m_prefix.Substring(2);
+        }
+    }
+
+    private void AddIndent() {
+        if (m_prettyPrint) {
+            m_builder.Append(m_prefix);
+        }
+    }
+
+    private void AddLine() {
+        if (m_prettyPrint) {
+            m_builder.Append("\n");
+        }
+    }
+
+    private void AddSpace() {
+        if (m_prettyPrint) {
+            m_builder.Append(" ");
+        }
+    }
 
     private void SerializeValue(object obj) {
         if (obj == null) {
@@ -270,14 +333,24 @@ public class Serializer {
             SerializeArray(obj);
         } else if (type == typeof(string)) {
             SerializeString(obj as string);
-        } else if (type == typeof(int)) {
-            m_builder.Append(obj);
-        } else if (type == typeof(float)) {
-            m_builder.Append(((float)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
-        } else if (type == typeof(double)) {
-            m_builder.Append(((double)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        } else if (type == typeof(Char)) {
+            SerializeString(obj.ToString());
         } else if (type == typeof(bool)) {
             m_builder.Append((bool)obj ? "true" : "false");
+        } else if (type.IsPrimitive) {
+            m_builder.Append(System.ComponentModel.TypeDescriptor.GetConverter(type).ConvertToInvariantString(obj));
+
+//            m_builder.Append(Convert.ChangeType(obj, typeof(string)));
+//        } else if (type == typeof(int)) {
+//            m_builder.Append(obj);
+//        } else if (type == typeof(Int64)) {
+//            m_builder.Append(obj);
+//        } else if (type == typeof(float)) {
+//            m_builder.Append(((float)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+//        } else if (type == typeof(double)) {
+//            m_builder.Append(((double)obj).ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        } else if (type.IsValueType) {
+            SerializeObject(obj);
         } else if (type.IsClass) {
             SerializeObject(obj);
         } else {
@@ -287,44 +360,89 @@ public class Serializer {
 
     private void SerializeArray(object obj) {
         m_builder.Append("[");
+        AddLine();
+        Indent();
         Array array = obj as Array;
         bool first = true;
         foreach (object element in array) {
             if (!first) {
                 m_builder.Append(",");
+                AddLine();
             }
+            AddIndent();
             SerializeValue(element);
             first = false;
         }
+        AddLine();
+        Outdent();
+        AddIndent();
         m_builder.Append("]");
+    }
+
+    private void SerializeDictionary(IDictionary obj) {
+        bool first = true;
+        foreach (object key in obj.Keys) {
+            if (!first) {
+                m_builder.Append(',');
+                AddLine();
+            }
+
+            AddIndent();
+            SerializeString(key.ToString());
+            m_builder.Append(':');
+            AddSpace();
+
+            SerializeValue(obj[key]);
+
+            first = false;
+        }
     }
 
     private void SerializeObject(object obj) {
         m_builder.Append("{");
+        AddLine();
+        Indent();
         bool first = true;
         if (m_includeTypeInfoForDerivedTypes) {
             // Only inlcude type info for derived types.
             System.Type type = obj.GetType();
             System.Type baseType = type.BaseType;
             if (baseType != null && baseType != typeof(System.Object)) {
+                AddIndent();
                 SerializeString("$dotNetType");  // assuming this won't clash with user's properties.
                 m_builder.Append(":");
+                AddSpace();
                 SerializeString(type.FullName);
             }
         }
-        System.Reflection.FieldInfo[] fields = obj.GetType().GetFields();
-        foreach (System.Reflection.FieldInfo info in fields) {
-            object fieldValue = info.GetValue(obj);
-            if (fieldValue != null) {
-				if (!first) {
-					m_builder.Append(",");
-				}
-				SerializeString(info.Name);
-                m_builder.Append(":");
-                SerializeValue(fieldValue);
-                first = false;
+
+        IDictionary asDict;
+        if ((asDict = obj as IDictionary) != null) {
+            SerializeDictionary(asDict);
+        } else {
+            System.Reflection.FieldInfo[] fields = obj.GetType().GetFields();
+            foreach (System.Reflection.FieldInfo info in fields) {
+                if (info.IsStatic) {
+                    continue;
+                }
+                object fieldValue = info.GetValue(obj);
+                if (fieldValue != null) {
+                    if (!first) {
+                        m_builder.Append(",");
+                        AddLine();
+                    }
+                    AddIndent();
+                    SerializeString(info.Name);
+                    m_builder.Append(":");
+                    AddSpace();
+                    SerializeValue(fieldValue);
+                    first = false;
+                }
             }
         }
+        AddLine();
+        Outdent();
+        AddIndent();
         m_builder.Append("}");
     }
 
