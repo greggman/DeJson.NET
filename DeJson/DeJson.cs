@@ -188,7 +188,7 @@ public class Deserializer {
         // Basically if the thing you want is a Dictionary<stirng, object>
         // Then just give it to you since that's the source. No need
         // to try to copy it.
-        if (destType == typeof(Dictionary<string, object>)) {
+        if (destType == typeof(System.Object)) {
             return src;
         }
 
@@ -238,11 +238,28 @@ public class Deserializer {
         }
     }
 
+    public static bool IsGenericList(object o)
+    {
+        bool isGenericList = false;
+
+        var oType = o.GetType();
+
+        if (oType.IsGenericType && (oType.GetGenericTypeDefinition() == typeof(List<>)))
+            isGenericList = true;
+
+        return isGenericList;
+    }
+
     private object ConvertToType(object value, System.Type type, Dictionary<string, object> src) {
         if (type.IsArray) {
             return ConvertToArray(value, type, src);
+//        } else if (type == typeof(List<object>)) {
+//            object[] oArray = ((List<object>)value).ToArray();
+//            return ConvertToArray(oArray, type, src); 
 //        } else if (type.IsPrimitive) {
 //           return System.ComponentModel.TypeDescriptor.GetConverter(type).ConvertFromInvariantString(value.ToString ());
+        } else if (type.IsEnum) {
+            return System.Enum.Parse(type, Convert.ToString(value));
         } else if (type == typeof(string)) {
             return Convert.ToString(value);
         } else if (type == typeof(Byte)) {
@@ -279,6 +296,8 @@ public class Deserializer {
             return Convert.ToBoolean(value);
         } else if (type.IsValueType) {
             return DeserializeO(type, (Dictionary<string, object>)value, src);
+        } else if (type == typeof(System.Object)) {
+            return value;
         } else if (type.IsClass) {
             return DeserializeO(type, (Dictionary<string, object>)value, src);
         } else {
@@ -380,6 +399,11 @@ public class Serializer {
 
         if (type.IsArray) {
             SerializeArray(obj);
+        } else if (type == typeof(List<Object>)) {
+            object[] oArray = ((List<object>)obj).ToArray();
+            SerializeArray(oArray);                 
+        } else if (type.IsEnum) {
+            SerializeString(obj.ToString());
         } else if (type == typeof(string)) {
             SerializeString(obj as string);
         } else if (type == typeof(Char)) {

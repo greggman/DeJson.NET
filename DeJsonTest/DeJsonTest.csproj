@@ -10,7 +10,8 @@
     <RootNamespace>DeJsonTest</RootNamespace>
     <AssemblyName>DeJsonTest</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ReleaseVersion>1.1.1</ReleaseVersion>
+    <ReleaseVersion>1.1.3</ReleaseVersion>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -33,7 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="nunit.framework">
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\Applications\Unity\MonoDevelop.app\Contents\MacOS\lib\monodevelop\Addins\NUnit\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

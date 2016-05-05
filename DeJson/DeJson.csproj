@@ -10,7 +10,8 @@
     <RootNamespace>DeJson</RootNamespace>
     <AssemblyName>DeJson</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ReleaseVersion>1.1.1</ReleaseVersion>
+    <ReleaseVersion>1.1.3</ReleaseVersion>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>

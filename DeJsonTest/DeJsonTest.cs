@@ -709,6 +709,88 @@ namespace DeJsonTest
             Assert.AreEqual(p.someint, p2.someint);
             Assert.AreEqual(p.somebool, p2.somebool);
         }
+
+        enum CarType {
+            Ford,
+            Chevy,
+            Toyota,
+        };
+
+        class Car {
+            public Car() {
+            }
+            public Car(CarType _type) {
+                type = _type;
+            }
+            public CarType type = CarType.Ford;
+        };
+
+        [Test()]
+        public void EnumTest()
+        {
+            Car a = new Car(CarType.Chevy);
+            string json = Serializer.Serialize(a);
+            Deserializer deserializer = new Deserializer();
+            Car b = deserializer.Deserialize<Car>(json);
+
+            string expected = "{\"type\":\"Chevy\"}";
+            Assert.AreEqual(json, expected);
+            Assert.AreEqual(a.type, b.type);
+        }
+
+        class ThingWithArray
+        {
+            public float[] stuff = new float[3];
+        }
+        class ThingWithClass
+        {
+            public ThingWithArray inner;
+        }
+
+        [Test()]
+        public void ArrayOFClassOfClassWithArray()
+        {
+            var twa = new ThingWithArray();
+            twa.stuff[0] = 123.0f;
+            twa.stuff[1] = 456.0f;
+            twa.stuff[2] = 789.0f;
+            ThingWithClass twc = new ThingWithClass();
+            twc.inner = twa;
+            ThingWithClass[] arr = new ThingWithClass[2];
+            arr[0] = twc;
+            arr[1] = twc;
+            string json = Serializer.Serialize(arr);
+            string expected = "[{\"inner\":{\"stuff\":[123,456,789]}},{\"inner\":{\"stuff\":[123,456,789]}}]";
+            Assert.AreEqual(expected, json);
+
+            Deserializer deserializer = new Deserializer();
+            object temp = deserializer.Deserialize<object>(json);
+            Assert.AreEqual(typeof(List<object>), temp.GetType());
+            string json2 = Serializer.Serialize(temp);
+            Assert.AreEqual(json, json2);
+
+            ThingWithClass[] n = deserializer.Deserialize<ThingWithClass[]>(json2);
+            Assert.AreEqual(n.Length, arr.Length);
+            Assert.AreEqual(n[0].inner.stuff[0], arr[0].inner.stuff[0]);
+            Assert.AreEqual(n[0].inner.stuff[1], arr[0].inner.stuff[1]);
+            Assert.AreEqual(n[0].inner.stuff[2], arr[0].inner.stuff[2]);
+            Assert.AreEqual(n[1].inner.stuff[0], arr[1].inner.stuff[0]);
+            Assert.AreEqual(n[1].inner.stuff[1], arr[1].inner.stuff[1]);
+            Assert.AreEqual(n[1].inner.stuff[2], arr[1].inner.stuff[2]);
+        }
+
+        [Test()]
+        public void ObjectTest() {
+            Car a = new Car(CarType.Chevy);
+            string json = Serializer.Serialize(a);
+            Deserializer deserializer = new Deserializer();
+            object o = deserializer.Deserialize<object>(json);
+            string json2 = Serializer.Serialize(o);
+            Car b = deserializer.Deserialize<Car>(json2);
+            string expected = "{\"type\":\"Chevy\"}";
+            Assert.AreEqual(json, expected);
+            Assert.AreEqual(a.type, b.type);
+        }
     }
 }
 

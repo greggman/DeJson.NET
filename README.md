@@ -68,6 +68,38 @@ Example:
         Console.WriteLine(Serializer.Serialize(k));
     }
 
+Enums are by string
+-------------------
+
+    enum CarType {
+        Ford,
+        Chevy,
+        Toyota,
+    };
+
+    class Car {
+        public Car() {
+        }
+        public Car(CarType _type) {
+            type = _type;
+        }
+        public CarType type = CarType.Ford;
+    };
+
+    [Test()]
+    public void EnumTest()
+    {
+        Car a = new Car(CarType.Chevy);
+        string json = Serializer.Serialize(a);
+        Deserializer deserializer = new Deserializer();
+        Car b = deserializer.Deserialize<Car>(json);
+
+        string expected = "{\"type\":\"Chevy\"}";
+        Assert.AreEqual(json, expected);
+        Assert.AreEqual(a.type, b.type);
+    }
+
+
 Deserializing Derived Types
 ---------------------------
 
