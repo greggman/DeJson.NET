@@ -791,6 +791,28 @@ namespace DeJsonTest
             Assert.AreEqual(json, expected);
             Assert.AreEqual(a.type, b.type);
         }
+
+        public class MCD {
+        }
+
+        public class MSD : MCD {
+            public int abc;
+        }
+
+        [Test()]
+        public void DerivedTestThroughDictionary() {
+
+            var m = new MSD();
+            m.abc = 123;
+            string json = Serializer.Serialize(m);
+            Deserializer d = new Deserializer();
+            Dictionary<string, object> dict = d.Deserialize<Dictionary<string, object>>(json);
+            Assert.IsTrue(dict.ContainsKey("abc"));
+            Assert.AreEqual(Convert.ToInt32(dict["abc"]), 123);
+            object o = dict;
+            var m2 = d.Deserialize<MSD>(o);
+            Assert.AreEqual(m2.abc, m.abc);
+        }
     }
 }
 

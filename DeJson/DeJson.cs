@@ -188,7 +188,8 @@ public class Deserializer {
         // Basically if the thing you want is a Dictionary<stirng, object>
         // Then just give it to you since that's the source. No need
         // to try to copy it.
-        if (destType == typeof(System.Object)) {
+        if (destType == typeof(System.Object) ||
+            destType == typeof(System.Collections.Generic.Dictionary<string, object>)) {
             return src;
         }
 
