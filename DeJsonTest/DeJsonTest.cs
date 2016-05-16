@@ -813,6 +813,68 @@ namespace DeJsonTest
             var m2 = d.Deserialize<MSD>(o);
             Assert.AreEqual(m2.abc, m.abc);
         }
+
+        public class FooList {
+            public int x = 0;
+            public int y = 0;
+            public List<Bar> g = new List<Bar>();
+        }
+
+        [Test()]
+        public void ClassWithGenericListOfClasses() {
+            FooList fl = new FooList();
+            fl.x = 12;
+            fl.y = 34;
+            Bar b1 = new Bar();
+            b1.z = 56;
+            Bar b2 = new Bar();
+            b2.z = 78;
+            fl.g.Add(b1);
+            fl.g.Add(b2);
+            string json = Serializer.Serialize(fl);
+            Deserializer d = new Deserializer();
+            FooList fl2 = d.Deserialize<FooList>(json);
+            Assert.AreEqual(fl2.x, fl.x);
+            Assert.AreEqual(fl2.y, fl.y);
+            Assert.AreEqual(fl2.g.Count, fl.g.Count);
+            Assert.AreEqual(fl2.g[0].z, fl.g[0].z);
+            Assert.AreEqual(fl2.g[1].z, fl.g[1].z);
+        }
+
+        public class FooDict {
+            public int x = 0;
+            public int y = 0;
+            public Dictionary<string, Bar> g = new Dictionary<string, Bar>();
+            public Dictionary<int, Bar> h = new Dictionary<int, Bar>();
+        }
+
+        [Test()]
+        public void ClassWithGenericDictOfClasses() {
+            FooDict fl = new FooDict();
+            fl.x = 12;
+            fl.y = 34;
+            Bar b1 = new Bar(); b1.z = 56;
+            Bar b2 = new Bar(); b2.z = 78;
+            Bar b3 = new Bar(); b1.z = 56;
+            Bar b4 = new Bar(); b2.z = 78;
+            fl.g["abc"] = b1;
+            fl.g["def"] = b2;
+            fl.h[246] = b3;
+            fl.h[357] = b4;
+            string json = Serializer.Serialize(fl);
+            Deserializer d = new Deserializer();
+            FooDict fl2 = d.Deserialize<FooDict>(json);
+            Assert.AreEqual(fl2.x, fl.x);
+            Assert.AreEqual(fl2.y, fl.y);
+            Assert.AreEqual(fl2.g.Count, fl.g.Count);
+            Assert.AreEqual(fl2.h.Count, fl.h.Count);
+            Assert.AreEqual(fl2.g["abc"].z, fl.g["abc"].z);
+            Assert.AreEqual(fl2.g["def"].z, fl.g["def"].z);
+            Assert.AreEqual(fl2.h[246].z, fl.h[246].z);
+            Assert.AreEqual(fl2.h[357].z, fl.h[357].z);
+        }
+
+
     }
 }
 

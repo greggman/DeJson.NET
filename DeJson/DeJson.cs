@@ -239,21 +239,23 @@ public class Deserializer {
         }
     }
 
-    public static bool IsGenericList(object o)
+    public static bool IsGenericList(System.Type type)
     {
-        bool isGenericList = false;
+        return type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>));
+    }
 
-        var oType = o.GetType();
-
-        if (oType.IsGenericType && (oType.GetGenericTypeDefinition() == typeof(List<>)))
-            isGenericList = true;
-
-        return isGenericList;
+    public static bool IsGenericDictionary(System.Type type)
+    {
+        return type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>));
     }
 
     private object ConvertToType(object value, System.Type type, Dictionary<string, object> src) {
         if (type.IsArray) {
             return ConvertToArray(value, type, src);
+        } else if (Deserializer.IsGenericList(type)) {
+            return ConvertToList(value, type, src);
+        } else if (Deserializer.IsGenericDictionary(type)) {
+            return ConvertToDictionary(value, type, src);
 //        } else if (type == typeof(List<object>)) {
 //            object[] oArray = ((List<object>)value).ToArray();
 //            return ConvertToArray(oArray, type, src); 
@@ -305,6 +307,36 @@ public class Deserializer {
             // Should we throw here?
         }
         return value;
+    }
+
+    private object ConvertToDictionary(object value, System.Type type, Dictionary<string, object> src) {
+        Type typeDef = type.GetGenericTypeDefinition();
+        Type[] typeArgs = type.GetGenericArguments();
+        Type constructed = typeDef.MakeGenericType(typeArgs);
+        object dict = Activator.CreateInstance(constructed);
+        Dictionary<string, object> srcDict = (Dictionary<string, object>)value;
+        foreach(KeyValuePair<string, object> entry in srcDict)
+        {
+            object elementKey = ConvertToType(entry.Key, typeArgs[0], src);
+            object elementValue = ConvertToType(entry.Value, typeArgs[1], src);
+            dict.GetType().GetMethod("Add").Invoke(dict, new[] {elementKey, elementValue});
+        }
+        return dict;
+    }
+
+    private object ConvertToList(object value, System.Type type, Dictionary<string, object> src) {
+        Type typeDef = type.GetGenericTypeDefinition();
+        Type[] typeArgs = type.GetGenericArguments();
+        Type constructed = typeDef.MakeGenericType(typeArgs);
+        object list = Activator.CreateInstance(constructed);
+        List<object> elements = (List<object>)value;
+        int index = 0;
+        foreach (object elementValue in elements) {
+            object o = ConvertToType(elementValue, typeArgs[0], src);
+            list.GetType().GetMethod("Add").Invoke(list, new[] {o});
+            ++index;
+        }
+        return list;
     }
 
     private object ConvertToArray(object value, System.Type type, Dictionary<string, object> src) {
@@ -400,9 +432,15 @@ public class Serializer {
 
         if (type.IsArray) {
             SerializeArray(obj);
-        } else if (type == typeof(List<Object>)) {
-            object[] oArray = ((List<object>)obj).ToArray();
-            SerializeArray(oArray);                 
+        } else if (Deserializer.IsGenericList(type)) { //(type == typeof(List<Object>)) {
+                Type elementType = type.GetGenericArguments()[0];
+                System.Reflection.MethodInfo castMethod = typeof(System.Linq.Enumerable).GetMethod("Cast").MakeGenericMethod( new System.Type[]{ elementType } );
+                System.Reflection.MethodInfo toArrayMethod = typeof(System.Linq.Enumerable).GetMethod("ToArray").MakeGenericMethod( new System.Type[]{ elementType } );
+            var castedObjectEnum = castMethod.Invoke(null, new object[] { obj });
+            var castedObject = toArrayMethod.Invoke(null, new object[] { castedObjectEnum });
+//            object[] oArray = ((List<object>)obj).ToArray();
+//            SerializeArray(oArray);
+            SerializeArray(castedObject);
         } else if (type.IsEnum) {
             SerializeString(obj.ToString());
         } else if (type == typeof(string)) {
