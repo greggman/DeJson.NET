@@ -4,6 +4,6 @@ install:
   - nuget restore DeJson.NET.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
-  - xbuild /p:Configuration=Release DeJson.sln
+  - xbuild /p:Configuration=Release DeJson.NET.sln
   - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./DeJsonTest/bin/Release/DeJsonTest.dll
 
