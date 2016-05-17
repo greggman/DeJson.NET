@@ -1,7 +1,7 @@
 language: csharp
-solution: DeJson.sln
+solution: DeJson.NET.sln
 install:
-  - nuget restore DeJson.sln
+  - nuget restore DeJson.NET.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release DeJson.sln
