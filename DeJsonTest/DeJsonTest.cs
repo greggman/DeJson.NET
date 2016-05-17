@@ -906,7 +906,6 @@ namespace DeJsonTest
         public void ClassWithPrivateFields() {
             var p = new PrivateFields(123, "abc");
             string json = Serializer.Serialize(p, false, false, true);
-            System.Console.WriteLine(json);
             Deserializer d = new Deserializer(true);
             PrivateFields p2 = d.Deserialize<PrivateFields>(json);
             Assert.AreEqual(p2.Num, p.Num);
