@@ -874,6 +874,44 @@ namespace DeJsonTest
             Assert.AreEqual(fl2.h[357].z, fl.h[357].z);
         }
 
+        public class PrivateFields {
+            public PrivateFields() {} // needed for deserialization
+            public PrivateFields(int n, string s) {
+                num = n;
+                str = s;
+            }
+
+            public int Num {
+                get {
+                    return num;
+                }
+                set {
+                    num = value;
+                }
+            }
+
+            public string Str {
+                get {
+                    return str;
+                }
+                set {
+                    str = value;
+                }
+            }
+
+            private string str;
+            private int num;
+        }
+        [Test()]
+        public void ClassWithPrivateFields() {
+            var p = new PrivateFields(123, "abc");
+            string json = Serializer.Serialize(p, false, false, true);
+            System.Console.WriteLine(json);
+            Deserializer d = new Deserializer(true);
+            PrivateFields p2 = d.Deserialize<PrivateFields>(json);
+            Assert.AreEqual(p2.Num, p.Num);
+            Assert.AreEqual(p2.Str, p.Str);
+        }
 
     }
 }

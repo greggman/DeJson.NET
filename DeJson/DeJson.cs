@@ -95,8 +95,12 @@ public class Deserializer {
     /// <summary>
     /// Deserializer for Json to your classes.
     /// </summary>
-    public Deserializer() {
+    public Deserializer(bool includePrivateFields = false) {
         m_creators = new Dictionary<System.Type, CustomCreator>();
+        m_fieldFlags =
+            System.Reflection.BindingFlags.Instance |
+            System.Reflection.BindingFlags.Public |
+            (includePrivateFields ? System.Reflection.BindingFlags.NonPublic : 0);
     }
 
     /// <summary>
@@ -214,8 +218,7 @@ public class Deserializer {
 
     private void DeserializeIt(object dest, Dictionary<string, object> src) {
         System.Type type = dest.GetType();
-        System.Reflection.FieldInfo[] fields = type.GetFields();
-
+        System.Reflection.FieldInfo[] fields = type.GetFields(m_fieldFlags);
         DeserializeClassFields(dest, fields, src);
     }
 
@@ -354,6 +357,7 @@ public class Deserializer {
     }
 
     private Dictionary<System.Type, CustomCreator> m_creators;
+    private System.Reflection.BindingFlags m_fieldFlags;
 };
 
 /// <summary>
@@ -371,17 +375,23 @@ public class Serializer {
     /// <param name="includeTypeInfoForDerivedTypes">true if you want it to add type data for derived types</param>
     /// <param name="prettyPrint">try if you want whitespace, linebreaks, and indention</param>
     /// <returns>a json string representing the object passed in.</returns>
-    public static string Serialize(object obj, bool includeTypeInfoForDerivedTypes = false, bool prettyPrint = false) {
-        Serializer s = new Serializer(includeTypeInfoForDerivedTypes, prettyPrint);
+    public static string Serialize(object obj, bool includeTypeInfoForDerivedTypes = false, bool prettyPrint = false, bool includePrivateFields = false) {
+        Serializer s = new Serializer(includeTypeInfoForDerivedTypes, prettyPrint, includePrivateFields);
         s.SerializeValue(obj);
         return s.GetJson();
     }
 
-    private Serializer(bool includeTypeInfoForDerivedTypes, bool prettyPrint) {
+    private Serializer(bool includeTypeInfoForDerivedTypes, bool prettyPrint, bool includePrivateFields) {
         m_builder = new StringBuilder();
         m_includeTypeInfoForDerivedTypes = includeTypeInfoForDerivedTypes;
         m_prettyPrint = prettyPrint;
+        m_includePrivateFields = includePrivateFields;
         m_prefix = "";
+
+        m_fieldFlags =
+            System.Reflection.BindingFlags.Instance |
+            System.Reflection.BindingFlags.Public |
+            (m_includePrivateFields ? System.Reflection.BindingFlags.NonPublic : 0);
     }
 
     private string GetJson() {
@@ -391,6 +401,8 @@ public class Serializer {
     private StringBuilder m_builder;
     private bool m_includeTypeInfoForDerivedTypes;
     private bool m_prettyPrint;
+    private bool m_includePrivateFields;
+    private System.Reflection.BindingFlags m_fieldFlags;
     private string m_prefix;
 
     private void Indent() {
@@ -552,7 +564,7 @@ public class Serializer {
         if ((asDict = obj as IDictionary) != null) {
             SerializeDictionary(asDict);
         } else {
-            System.Reflection.FieldInfo[] fields = obj.GetType().GetFields();
+            System.Reflection.FieldInfo[] fields = obj.GetType().GetFields(m_fieldFlags);
             foreach (System.Reflection.FieldInfo info in fields) {
                 if (info.IsStatic) {
                     continue;
