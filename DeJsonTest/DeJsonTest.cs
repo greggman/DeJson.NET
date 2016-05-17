@@ -913,6 +913,17 @@ namespace DeJsonTest
             Assert.AreEqual(p2.Str, p.Str);
         }
 
+		[Test()]
+		public void CheckTypeNamesWork() {
+			Dog d = new Dog ();
+			System.Type t = d.GetType();
+			string typeStr = t.AssemblyQualifiedName;
+			System.Type t2 = System.Type.GetType(typeStr);
+			System.Type t3 = Deserializer.GetTypeByString (typeStr);
+			Assert.AreEqual(t, t2);
+			Assert.AreEqual(t, t3);
+		}
+
     }
 }
 

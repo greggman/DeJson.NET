@@ -92,6 +92,10 @@ public class Deserializer {
         public abstract System.Type TypeToCreate();
     }
 
+    static public System.Type GetTypeByString(string typeStr) {
+		return System.Type.GetType (typeStr);
+	}
+
     /// <summary>
     /// Deserializer for Json to your classes.
     /// </summary>
@@ -207,7 +211,7 @@ public class Deserializer {
             // Check if there is a type serialized for this
             object typeNameObject;
             if (src.TryGetValue("$dotNetType", out typeNameObject)) {
-                destType =System.Type.GetType((string)typeNameObject);
+                destType = System.Type.GetType((string)typeNameObject);
             }
             dest = Activator.CreateInstance(destType);
         }
@@ -556,7 +560,7 @@ public class Serializer {
                 SerializeString("$dotNetType");  // assuming this won't clash with user's properties.
                 m_builder.Append(":");
                 AddSpace();
-                SerializeString(type.FullName);
+                SerializeString(type.AssemblyQualifiedName);
             }
         }
 
