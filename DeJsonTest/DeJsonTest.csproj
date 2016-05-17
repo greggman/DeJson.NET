@@ -41,9 +41,9 @@
     <Compile Include="DeJsonTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DeJson.NET\DeJson.NET.csproj">
-      <Project>{F479C272-2264-4A75-BFE5-A02CCD9A914C}</Project>
-      <Name>DeJson.NET</Name>
+    <ProjectReference Include="..\DeJson\DeJson.csproj">
+      <Project>{B76B7899-A02E-4E1A-8EC5-CA63ED3DBB04}</Project>
+      <Name>DeJson</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

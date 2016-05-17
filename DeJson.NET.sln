@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeJson.NET", "DeJson.NET\DeJson.NET.csproj", "{F479C272-2264-4A75-BFE5-A02CCD9A914C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeJsonTest", "DeJsonTest\DeJsonTest.csproj", "{594B7366-C725-4444-B0E2-6761DB942662}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeJson", "DeJson\DeJson.csproj", "{B76B7899-A02E-4E1A-8EC5-CA63ED3DBB04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +15,9 @@ Global
 		{594B7366-C725-4444-B0E2-6761DB942662}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{594B7366-C725-4444-B0E2-6761DB942662}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{594B7366-C725-4444-B0E2-6761DB942662}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F479C272-2264-4A75-BFE5-A02CCD9A914C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F479C272-2264-4A75-BFE5-A02CCD9A914C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F479C272-2264-4A75-BFE5-A02CCD9A914C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F479C272-2264-4A75-BFE5-A02CCD9A914C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B76B7899-A02E-4E1A-8EC5-CA63ED3DBB04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B76B7899-A02E-4E1A-8EC5-CA63ED3DBB04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B76B7899-A02E-4E1A-8EC5-CA63ED3DBB04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B76B7899-A02E-4E1A-8EC5-CA63ED3DBB04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

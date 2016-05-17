@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F479C272-2264-4A75-BFE5-A02CCD9A914C}</ProjectGuid>
+    <ProjectGuid>{B76B7899-A02E-4E1A-8EC5-CA63ED3DBB04}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>DeJson.NET</RootNamespace>
-    <AssemblyName>DeJson.NET</AssemblyName>
+    <RootNamespace>DeJson</RootNamespace>
+    <AssemblyName>DeJson</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,8 +32,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MiniJSON.cs" />
     <Compile Include="DeJson.cs" />
+    <Compile Include="MiniJSON.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
