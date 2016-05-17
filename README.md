@@ -1,6 +1,8 @@
 DeJson.NET
 ==========
 
+[![Build Status](https://travis-ci.org/greggman/DeJson.NET.svg?branch=master)](https://travis-ci.org/greggman/DeJson.NET)
+
 A Deserializer/Serializer from JSON to C# classes.
 
 To use [grab the DLL here](https://github.com/greggman/DeJson.NET/releases/latest/)
