@@ -32,6 +32,8 @@ namespace DeJsonTest
             public int a = 0;
         }
         public class Foo {
+            public Foo() {}
+            public Foo(int _x, int _y, Bar[] _g, int[][] _b) { x = _x; y = _y; g = _g; b = _b; }
             public int x = 0;
             public int y = 0;
             public Bar[] g = null;
@@ -306,6 +308,19 @@ namespace DeJsonTest
             Assert.AreEqual(k[0], 4);
             Assert.AreEqual(k[1], 7);
             Assert.AreEqual(k[2], 9);
+        }
+
+        [Test()]
+        public void Basic2() {
+            var orig = new Foo(
+                123,
+                456,
+                new[]{new Bar(5, 12), new Bar(4, 23), new Bar(3, 34)},
+                new[]{new[]{1, 2}, new[]{4, 5, 6}, new[]{7, 6}}
+            );
+            string json = Serialize.From(orig);
+            var copy = Deserialize.To<Foo>(json);
+            CheckFoo(copy);
         }
 
         [Test()]
