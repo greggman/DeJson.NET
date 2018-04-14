@@ -37,6 +37,20 @@ using MiniJSON;
 
 namespace DeJson {
 
+public class Serialize {
+    public static string From(object obj) {
+        return Serializer.Serialize(obj);
+    }
+}
+
+public class Deserialize {
+    static public T To<T>(string json) {
+        object o = Json.Deserialize(json);
+        var d = new Deserializer();
+        return d.Deserialize<T>(o);
+    }
+}
+
 public class Deserializer {
 
     /// <summary>
