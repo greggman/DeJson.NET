@@ -14,10 +14,14 @@ Example:
     using DeJson;
 
     class Bar {
+        public Bar() {}
+        public Bar(int _z, int _a) { z = _z; a = _a; }
         public int z;
         public int a;
     }
     class Foo {
+        public Foo() {}
+        public Foo(int _x, int _y, Bar[] _g, int[][] _b) { x = _x; y = _y; g = _g; b = _b; }
         public int x;
         public int y;
         public Bar[] g;
@@ -25,49 +29,42 @@ Example:
     }
 
     void Test() {
-        // Make
-        Deserializer deserializer = new Deserializer();
+        // Serialize/Deserialize a complex structure
+        {
+            var orig = new Foo(
+                123,
+                456,
+                new[]{new Bar(5, 12), new Bar(4, 23), new Bar(3, 34)},
+                new[]{new[]{1, 2}, new[]{4, 5, 6}, new[]{7, 6}}
+            );
+            string json = Serialize.From(orig);
+            var copy = Deserialize.To<Foo>(json);
+        }
 
-        string json = "{\"x\":123,\"y\":456,\"g\":[{\"z\":5,\"a\":12},{\"z\":4,\"a\":23},{\"z\":3,\"a\":34}],\"b\":[[1,2],[4,5,6],[7,6]]}";
-
-        Foo f = deserializer.Deserialize<Foo>(json);
-
-        Console.WriteLine("f.x          : " + f.x       );
-        Console.WriteLine("f.y          : " + f.y       );
-        Console.WriteLine("f.g[0].z     : " + f.g[0].z  );
-        Console.WriteLine("f.g[0].a     : " + f.g[0].a  );
-        Console.WriteLine("f.g[1].z     : " + f.g[1].z  );
-        Console.WriteLine("f.g[1].a     : " + f.g[1].a  );
-        Console.WriteLine("f.g[2].z     : " + f.g[2].z  );
-        Console.WriteLine("f.g[2].a     : " + f.g[2].a  );
-        Console.WriteLine("f.g.Length   : " + f.g.Length);
-        Console.WriteLine("f.b[0][0]    : " + f.b[0][0] );
-        Console.WriteLine("f.b[0][1]    : " + f.b[0][1] );
-        Console.WriteLine("f.b[1][0]    : " + f.b[1][0] );
-        Console.WriteLine("f.b[1][1]    : " + f.b[1][1] );
-        Console.WriteLine("f.b[1][2]    : " + f.b[1][2] );
-        Console.WriteLine("f.b[2][0]    : " + f.b[2][0] );
-        Console.WriteLine("f.b[2][1]    : " + f.b[2][1] );
-        Console.WriteLine("f.b.Length   : " + f.b.Length);
-        Console.WriteLine("f.b[0].Length: " + f.b[0].Length);
-        Console.WriteLine("f.b[1].Length: " + f.b[1].Length);
-        Console.WriteLine("f.b[2].Length: " + f.b[2].Length);
-
-        // Serialize it.
-        Console.WriteLine(Serializer.Serialize(f));
-
-        // ----------------------------------------------
         // Array
+        {
+            int[] orig = {4, 7, 9};
+            string json = Serialize.From(orig);
+            int[] copy = Deserialize.To<int[]>(json);
+        }
 
-        string kj = "[4,7,9]";
+        // List
+        {
+            List<int> orig = new List(){4, 7, 9};
+            string json = Serialize.From(orig);
+            List<int> copy = Deserialize.To<List<int>>(json);
 
-        int[] k = deserializer.Deserialize<int[]>(kj);
+        }
 
-        Console.WriteLine("k[0]: " + k[0]);
-        Console.WriteLine("k[1]: " + k[1]);
-        Console.WriteLine("k[2]: " + k[2]);
+        // Dictonary
+        {
+            Dictionary<string, Bar> orig = new Dictionary<string, bar>();
+            orig["abc"] = new Bar(12, 34);
+            orig["def"] = new Bar(56, 78);
+            string json = Serialize.From(orig);
+            Dictionary<string, Bar> copy = Deserialize.To<Dictionary<string, Bar>>(json);
 
-        Console.WriteLine(Serializer.Serialize(k));
+        }
     }
 
 Enums are by string
@@ -282,8 +279,7 @@ This was written for consuming JSON provided by JavaScript in a browser
 Classes must have a no parameter constructor and all fields must be public.
 Consider these classes just for passing info through JSON.
 
-Generics are not supported AFAIK. I'm sure there's a host of other cases
-not supported.
+Generic `List`, `Dictionary` are supported.
 
 Array of Arrays are supported. But, being based on JavaScript multi-dimensional arrays
 are not.
