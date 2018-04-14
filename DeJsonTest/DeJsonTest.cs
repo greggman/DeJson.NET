@@ -290,14 +290,13 @@ namespace DeJsonTest
         [Test()]
         public void Basic ()
         {
-            Deserializer deserializer = new Deserializer();
             string json = "{\"x\":123,\"y\":456,\"g\":[{\"z\":5,\"a\":12},{\"z\":4,\"a\":23},{\"z\":3,\"a\":34}],\"b\":[[1,2],[4,5,6],[7,6]]}";
 
-            Foo f = deserializer.Deserialize<Foo>(json);
+            Foo f = Deserialize.To<Foo>(json);
             CheckFoo(f);
 
             string s = Serialize.From(f);
-            Foo f2 = deserializer.Deserialize<Foo>(s);
+            Foo f2 = Deserialize.To<Foo>(s);
 
             CheckFoo(f2);
         }
@@ -326,16 +325,14 @@ namespace DeJsonTest
         [Test()]
         public void ArrayTest()
         {
-            Deserializer deserializer = new Deserializer();
-
             string kj = "[4,7,9]";
 
-            int[] k = deserializer.Deserialize<int[]>(kj);
+            int[] k = Deserialize.To<int[]>(kj);
 
             CheckArray(k);
 
             string s = Serialize.From(k);
-            int[] k2 = deserializer.Deserialize<int[]>(s);
+            int[] k2 = Deserialize.To<int[]>(s);
 
             CheckArray(k2);
         }
@@ -343,10 +340,9 @@ namespace DeJsonTest
         [Test()]
         public void UndefinedTest()
         {
-            Deserializer deserializer = new Deserializer();
             string u1 = "{}";
 
-            Moo m = deserializer.Deserialize<Moo>(u1);
+            Moo m = Deserialize.To<Moo>(u1);
             Assert.AreEqual(m.b, null);
             Assert.AreEqual(m.a, null);
             Assert.AreEqual(m.c, null);
@@ -358,10 +354,9 @@ namespace DeJsonTest
         [Test()]
         public void SomeUndefinedTest()
         {
-            Deserializer deserializer = new Deserializer();
             string u1 = "{\"a\":\"b\"}";
 
-            Something s = deserializer.Deserialize<Something>(u1);
+            Something s = Deserialize.To<Something>(u1);
             Assert.AreEqual(s.a, "b");
             Assert.AreEqual(s.b, null);
 
@@ -369,7 +364,7 @@ namespace DeJsonTest
 
             Assert.AreEqual(ss, u1);
 
-            Something s2 = deserializer.Deserialize<Something>(ss);
+            Something s2 = Deserialize.To<Something>(ss);
 
             Assert.AreEqual(s2.a, "b");
             Assert.AreEqual(s2.b, null);
@@ -461,10 +456,8 @@ namespace DeJsonTest
             animals[0] = da;
             animals[1] = ca;
 
-            Deserializer deserializer = new Deserializer();
-
             string animalsJson = Serializer.Serialize(animals, true);
-            Animal[] ani = deserializer.Deserialize<Animal[]>(animalsJson);
+            Animal[] ani = Deserialize.To<Animal[]>(animalsJson);
 
             Assert.AreEqual(((Dog)ani[0]).barkiness, 123);
             Assert.AreEqual(((Cat)ani[1]).stealthiness, "super");
@@ -585,15 +578,13 @@ namespace DeJsonTest
         [Test()]
         public void RoundTrip01Test()
         {
-            Deserializer deserializer = new Deserializer();
-
             string j = "{\"cmd\":\"update\",\"id\":123,\"data\":{\"cmd\":\"setColor\",\"data\":{\"color\":\"red\",\"style\":\"bold\"}}}";
 
-            Dictionary<string, object>data1 = deserializer.Deserialize<Dictionary<string, object> >(j);
+            Dictionary<string, object>data1 = Deserialize.To<Dictionary<string, object> >(j);
 
             string newJ = Serialize.From(data1);
            
-            Dictionary<string, object>data2 = deserializer.Deserialize<Dictionary<string, object> >(newJ);
+            Dictionary<string, object>data2 = Deserialize.To<Dictionary<string, object> >(newJ);
 
             Assert.IsTrue(DictionariesAreSame(data1, data2));
 
@@ -609,17 +600,15 @@ namespace DeJsonTest
         [Test()]
         public void StructTest01()
         {
-            Deserializer deserializer = new Deserializer();
-
             string j = "{\"x\":1.2,\"y\":3.4}";
 
-            Vector2 v = deserializer.Deserialize<Vector2>(j);
+            Vector2 v = Deserialize.To<Vector2>(j);
             Assert.AreEqual(v.x, 1.2f);
             Assert.AreEqual(v.y, 3.4f);
 
             string newJ = Serialize.From(v);
 
-            Vector2 v2 = deserializer.Deserialize<Vector2>(newJ);
+            Vector2 v2 = Deserialize.To<Vector2>(newJ);
 
             Assert.AreEqual(v2.x, v.x);
             Assert.AreEqual(v2.y, v.y);
@@ -628,11 +617,9 @@ namespace DeJsonTest
         [Test()]
         public void StructTest02()
         {
-            Deserializer deserializer = new Deserializer();
-
             string j = "[{\"x\":1.2,\"y\":3.4},{\"x\":5.6,\"y\":7.8}]";
 
-            Vector2[] v = deserializer.Deserialize<Vector2[]>(j);
+            Vector2[] v = Deserialize.To<Vector2[]>(j);
             Assert.AreEqual(v.Length, 2);
             Assert.AreEqual(v[0].x, 1.2f);
             Assert.AreEqual(v[0].y, 3.4f);
@@ -641,7 +628,7 @@ namespace DeJsonTest
 
             string newJ = Serialize.From(v);
 
-            Vector2[] v2 = deserializer.Deserialize<Vector2[]>(newJ);
+            Vector2[] v2 = Deserialize.To<Vector2[]>(newJ);
 
             Assert.AreEqual(v2.Length, 2);
             Assert.AreEqual(v2[0].x, v[0].x);
@@ -667,8 +654,7 @@ namespace DeJsonTest
             Assert.AreEqual(false, json.Contains("someStaticProp"));
 
             string j = "{\"someProp\":123,\"someStaticProp\":789}";
-            Deserializer deserializer = new Deserializer();
-            HasStatic s2 = deserializer.Deserialize<HasStatic>(j);
+            HasStatic s2 = Deserialize.To<HasStatic>(j);
             Assert.AreEqual(s2.someProp, 123);
             Assert.AreEqual(HasStatic.someStaticProp, 456);
         }
@@ -712,8 +698,7 @@ namespace DeJsonTest
             p.somebool = false;
 
             string json = Serialize.From(p);
-            Deserializer deserializer = new Deserializer();
-            Primitives p2 = deserializer.Deserialize<Primitives>(json);
+            Primitives p2 = Deserialize.To<Primitives>(json);
 
             Assert.AreEqual(p.someBoolean, p2.someBoolean);
             Assert.AreEqual(p.someByte, p2.someByte);
@@ -752,8 +737,7 @@ namespace DeJsonTest
         {
             Car a = new Car(CarType.Chevy);
             string json = Serializer.Serialize(a);
-            Deserializer deserializer = new Deserializer();
-            Car b = deserializer.Deserialize<Car>(json);
+            Car b = Deserialize.To<Car>(json);
 
             string expected = "{\"type\":\"Chevy\"}";
             Assert.AreEqual(json, expected);
@@ -785,13 +769,12 @@ namespace DeJsonTest
             string expected = "[{\"inner\":{\"stuff\":[123,456,789]}},{\"inner\":{\"stuff\":[123,456,789]}}]";
             Assert.AreEqual(expected, json);
 
-            Deserializer deserializer = new Deserializer();
-            object temp = deserializer.Deserialize<object>(json);
+            object temp = Deserialize.To<object>(json);
             Assert.AreEqual(typeof(List<object>), temp.GetType());
             string json2 = Serializer.Serialize(temp);
             Assert.AreEqual(json, json2);
 
-            ThingWithClass[] n = deserializer.Deserialize<ThingWithClass[]>(json2);
+            ThingWithClass[] n = Deserialize.To<ThingWithClass[]>(json2);
             Assert.AreEqual(n.Length, arr.Length);
             Assert.AreEqual(n[0].inner.stuff[0], arr[0].inner.stuff[0]);
             Assert.AreEqual(n[0].inner.stuff[1], arr[0].inner.stuff[1]);
@@ -805,10 +788,9 @@ namespace DeJsonTest
         public void ObjectTest() {
             Car a = new Car(CarType.Chevy);
             string json = Serializer.Serialize(a);
-            Deserializer deserializer = new Deserializer();
-            object o = deserializer.Deserialize<object>(json);
+            object o = Deserialize.To<object>(json);
             string json2 = Serializer.Serialize(o);
-            Car b = deserializer.Deserialize<Car>(json2);
+            Car b = Deserialize.To<Car>(json2);
             string expected = "{\"type\":\"Chevy\"}";
             Assert.AreEqual(json, expected);
             Assert.AreEqual(a.type, b.type);
@@ -827,11 +809,11 @@ namespace DeJsonTest
             var m = new MSD();
             m.abc = 123;
             string json = Serializer.Serialize(m);
-            Deserializer d = new Deserializer();
-            Dictionary<string, object> dict = d.Deserialize<Dictionary<string, object>>(json);
+            Dictionary<string, object> dict = Deserialize.To<Dictionary<string, object>>(json);
             Assert.IsTrue(dict.ContainsKey("abc"));
             Assert.AreEqual(Convert.ToInt32(dict["abc"]), 123);
             object o = dict;
+            var d = new Deserializer();
             var m2 = d.Deserialize<MSD>(o);
             Assert.AreEqual(m2.abc, m.abc);
         }
@@ -854,8 +836,7 @@ namespace DeJsonTest
             fl.g.Add(b1);
             fl.g.Add(b2);
             string json = Serializer.Serialize(fl);
-            Deserializer d = new Deserializer();
-            FooList fl2 = d.Deserialize<FooList>(json);
+            FooList fl2 = Deserialize.To<FooList>(json);
             Assert.AreEqual(fl2.x, fl.x);
             Assert.AreEqual(fl2.y, fl.y);
             Assert.AreEqual(fl2.g.Count, fl.g.Count);
@@ -884,8 +865,7 @@ namespace DeJsonTest
             fl.h[246] = b3;
             fl.h[357] = b4;
             string json = Serializer.Serialize(fl);
-            Deserializer d = new Deserializer();
-            FooDict fl2 = d.Deserialize<FooDict>(json);
+            FooDict fl2 = Deserialize.To<FooDict>(json);
             Assert.AreEqual(fl2.x, fl.x);
             Assert.AreEqual(fl2.y, fl.y);
             Assert.AreEqual(fl2.g.Count, fl.g.Count);
@@ -934,16 +914,16 @@ namespace DeJsonTest
             Assert.AreEqual(p2.Str, p.Str);
         }
 
-		[Test()]
-		public void CheckTypeNamesWork() {
-			Dog d = new Dog ();
-			System.Type t = d.GetType();
-			string typeStr = t.AssemblyQualifiedName;
-			System.Type t2 = System.Type.GetType(typeStr);
-			System.Type t3 = Deserializer.GetTypeByString (typeStr);
-			Assert.AreEqual(t, t2);
-			Assert.AreEqual(t, t3);
-		}
+        [Test()]
+        public void CheckTypeNamesWork() {
+            Dog d = new Dog ();
+            System.Type t = d.GetType();
+            string typeStr = t.AssemblyQualifiedName;
+            System.Type t2 = System.Type.GetType(typeStr);
+            System.Type t3 = Deserializer.GetTypeByString (typeStr);
+            Assert.AreEqual(t, t2);
+            Assert.AreEqual(t, t3);
+        }
 
         [Test()]
         public void SimpleTest()
